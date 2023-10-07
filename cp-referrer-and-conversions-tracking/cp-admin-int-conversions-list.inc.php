@@ -68,7 +68,7 @@ $nonce = wp_create_nonce( 'cpreftrack_actions_booking' );
  {
     if (confirm('Are you sure that you want to delete this item?'))
     {
-        document.location = 'admin.php?page=<?php echo $this->menu_parameter; ?>_conversions&anonce=<?php echo $nonce; ?>&ld='+id+'&r='+Math.random();
+        document.location = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>_conversions&anonce=<?php echo esc_js($nonce); ?>&ld='+id+'&r='+Math.random();
     }
  }
  function cp_deletemarked()
@@ -80,14 +80,14 @@ $nonce = wp_create_nonce( 'cpreftrack_actions_booking' );
  {
     if (confirm('Are you sure that you want to delete ALL items for this form?'))
     {
-        document.location = 'admin.php?page=<?php echo $this->menu_parameter; ?>_conversions&del=all&r='+Math.random()+'&anonce=<?php echo $nonce; ?>';
+        document.location = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>_conversions&del=all&r='+Math.random()+'&anonce=<?php echo esc_js($nonce); ?>';
     }
  }
  function cp_markall()
  {
      var ischecked = document.getElementById("cpcontrolck").checked;
      <?php for ($i=($current_page-1)*$records_per_page; $i<$current_page*$records_per_page; $i++) if (isset($events[$i])) { ?>
-     document.forms.dex_table_form.c<?php echo $i-($current_page-1)*$records_per_page; ?>.checked = ischecked;
+     document.forms.dex_table_form.c<?php echo intval($i-($current_page-1)*$records_per_page); ?>.checked = ischecked;
      <?php } ?>
  }
 </script>
@@ -102,7 +102,7 @@ $nonce = wp_create_nonce( 'cpreftrack_actions_booking' );
 <div class="ahb-section-container">
 	<div class="ahb-section">
       <form action="admin.php" method="get">
-        <input type="hidden" name="page" value="<?php echo $this->menu_parameter; ?>_conversions" />
+        <input type="hidden" name="page" value="<?php echo esc_attr($this->menu_parameter); ?>_conversions" />
 		<nobr><label><?php _e('Search for','cp-referrer-and-conversions-tracking'); ?>:</label> <input type="text" name="search" value="<?php echo esc_attr($search_value); ?>">&nbsp;&nbsp;</nobr>
 		<nobr><label><?php _e('From','cp-referrer-and-conversions-tracking'); ?>:</label> <input autocomplete="off" type="text" id="dfrom" name="dfrom" value="<?php echo esc_attr($rawfrom); ?>" >&nbsp;&nbsp;</nobr>
 		<nobr><label><?php _e('To','cp-referrer-and-conversions-tracking'); ?>:</label> <input autocomplete="off" type="text" id="dto" name="dto" value="<?php echo esc_attr($rawto); ?>" >&nbsp;&nbsp;</nobr>
@@ -138,9 +138,9 @@ echo paginate_links(  array(
 
 <div id="dex_printable_contents" style="overflow:visible !important;">
 <form name="dex_table_form" id="dex_table_form" action="admin.php" method="get">
- <input type="hidden" name="page" value="<?php echo $this->menu_parameter; ?>_conversions" />
+ <input type="hidden" name="page" value="<?php echo esc_attr($this->menu_parameter); ?>_conversions" />
  <input type="hidden" name="delmark" value="1" />
- <input type="hidden" name="anonce" value="<?php echo $nonce; ?>" />
+ <input type="hidden" name="anonce" value="<?php echo esc_attr($nonce); ?>" />
 <div class="ahb-orderssection-container" style="background:#f6f6f6;padding-bottom:20px;">
 <table border="0" style="width:100%;" class="ahb-orders-list" cellpadding="10" cellspacing="10">
 	<thead>
@@ -157,25 +157,25 @@ echo paginate_links(  array(
 	<tbody id="the-list">
     <?php for ($i=($current_page-1)*$records_per_page; $i<$current_page*$records_per_page; $i++) if (isset($events[$i])) { ?>
 	  <tr class='<?php if (($i%2)) { ?>alternate <?php } ?>author-self status-draft format-default iedit' valign="top">
-        <th><input type="checkbox" name="c<?php echo $i-($current_page-1)*$records_per_page; ?>" value="<?php echo $events[$i]->id; ?>" /></th>
-        <th><?php echo $events[$i]->id; ?></th>
-		<td><?php echo $events[$i]->time; ?></td>
-        <td><?php echo htmlentities($events[$i]->convname); ?></td>
-        <td><?php echo apply_filters( $events[$i]->convname, $events[$i]->convdesc ); ?></td>
-		<?php $ref = htmlentities($events[$i]->referrer);
-              $reflast = htmlentities($events[$i]->referrerlast);
+        <th><input type="checkbox" name="c<?php echo intval($i-($current_page-1)*$records_per_page); ?>" value="<?php echo esc_attr($events[$i]->id); ?>" /></th>
+        <th><?php echo esc_html($events[$i]->id); ?></th>
+		<td><?php echo esc_html($events[$i]->time); ?></td>
+        <td><?php echo esc_html($events[$i]->convname); ?></td>
+        <td><?php echo (apply_filters( $events[$i]->convname, $events[$i]->convdesc )); ?></td>
+		<?php $ref = $events[$i]->referrer;
+              $reflast = $events[$i]->referrerlast;
                    if ($ref)
                    {
                        echo '<td>';
-                       echo $ref;
+                       echo esc_html($ref);
                        if ($reflast!= '' && $ref != $reflast)
-                           echo '<br /><br /><span style="color:#aaaaaa"><b>Last referrer:</b> '.$reflast;
+                           echo '<br /><br /><span style="color:#aaaaaa"><b>Last referrer:</b> '.esc_html($reflast);
                        
                        $entry = isset($events[$i]->entry) ? $events[$i]->entry : '';
                        if (strlen($entry) > 33)
                            $entry = "...".substr($entry, strlen($entry) -30);
                        if ($entry != '')
-                           echo '<br /><br /><strong>'.__('Entry page:','cp-referrer-and-conversions-tracking').'</strong><br><a href="'.esc_url($data["entry"]).'" target="_blank">'.esc_html($entry).'</a>'; 
+                           echo '<br /><br /><strong>'.__('Entry page:','cp-referrer-and-conversions-tracking').'</strong><br><a href="'.esc_url($events[$i]->entry).'" target="_blank">'.esc_html($entry).'</a>'; 
               
                        echo '</td>';
                    }
@@ -183,7 +183,7 @@ echo paginate_links(  array(
                        echo '<td style="color: #cccccc">'.__('N/A - unable to find the referrer source','cp-referrer-and-conversions-tracking').'</td>';
                    ?>
 		<td class="cpnopr" style="text-align:center;">
-		  <input class="button" type="button" name="caldelete_<?php echo $events[$i]->id; ?>" value="Delete" onclick="cp_deleteMessageItem('<?php echo $events[$i]->id; ?>');" />
+		  <input class="button" type="button" name="caldelete_<?php echo esc_attr($events[$i]->id); ?>" value="Delete" onclick="cp_deleteMessageItem('<?php echo esc_attr($events[$i]->id); ?>');" />
 		</td>
       </tr>
     <?php } ?>

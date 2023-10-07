@@ -60,14 +60,22 @@ $fields["ip"] = array();
 
 foreach ($events as $item)
 {
+    if (!isset($fields["referrer"]["k".$item->referrer])) $fields["referrer"]["k".$item->referrer] = 0;
+    if (!isset($fields["date"]["k".substr($item->time,0,10)])) $fields["date"]["k".substr($item->time,0,10)] = 0;
+    if (!isset($fields["time"]["k".substr($item->time,11,2)])) $fields["time"]["k".substr($item->time,11,2)] = 0;
+    if (isset($item->ipaddr) && !isset($fields["ip"]["k".$item->ipaddr])) $fields["ip"]["k".$item->ipaddr] = 0;
+    
     $fields["referrer"]["k".$item->referrer]++;
     $fields["date"]["k".substr($item->time,0,10)]++;
     $fields["time"]["k".substr($item->time,11,2)]++;
-    $fields["ip"]["k".$item->ipaddr]++;
-    $params = unserialize($item->posted_data);
-    foreach ($params as $param => $value)
-        if (strlen($value) < 100)
-            $fields[$param]["k".$value]++;
+    if (isset($item->ipaddr)) $fields["ip"]["k".$item->ipaddr]++;
+    if (isset($item->posted_data))
+    {
+        $params = unserialize($item->posted_data);
+        foreach ($params as $param => $value)
+            if (strlen($value) < 100)
+                $fields[$param]["k".$value]++;
+    }
 }
 
 
@@ -120,7 +128,7 @@ $form = array();
 <div class="ahb-section-container">
 	<div class="ahb-section">
        <form action="admin.php" method="get">
-        <input type="hidden" name="page" value="<?php echo $this->menu_parameter; ?>_report" />
+        <input type="hidden" name="page" value="<?php echo esc_attr($this->menu_parameter); ?>_report" />
         <input type="hidden" name="field" value="<?php echo esc_attr($field_filter); ?>" />
 		<nobr><label><?php _e('Search for','cp-referrer-and-conversions-tracking'); ?>:</label> <input type="text" name="search" value="<?php echo esc_attr($search_value); ?>">&nbsp;&nbsp;</nobr>
 		<nobr><label><?php _e('From','cp-referrer-and-conversions-tracking'); ?>:</label> <input autocomplete="off" type="text" id="dfrom" name="dfrom" value="<?php echo esc_attr($date_start); ?>" >&nbsp;&nbsp;</nobr>
@@ -129,7 +137,7 @@ $form = array();
           <option value="0">[<?php _e('All Items','cp-referrer-and-conversions-tracking'); ?>]</option>
     </select></nobr>
 		<nobr>
-			<input type="submit" name="<?php echo $this->prefix; ?>_csv" value="<?php _e('Export to CSV','cp-referrer-and-conversions-tracking'); ?>" class="button" style="float:right;margin-left:10px;">
+			<input type="submit" name="<?php echo esc_attr($this->prefix); ?>_csv" value="<?php _e('Export to CSV','cp-referrer-and-conversions-tracking'); ?>" class="button" style="float:right;margin-left:10px;">
 			<input type="submit" name="ds" value="<?php _e('Filter','cp-referrer-and-conversions-tracking'); ?>" class="button-primary button" style="float:right;">
 		</nobr>
        </form>
@@ -145,7 +153,7 @@ $form = array();
         <div class="canvas" id="cardiocontainer1" style="margin-left:10px;position:relative;">
          <canvas id="cardio1"  width="300" height="200" questions='[{"color":"#008ec2","values":[<?php echo htmlentities($daily_messages); ?>]}]'></canvas>
         </div>
-        <div style="padding-right:5px;padding-left:5px;color:#888888;">* <?php _e('Logs per day in the selected date range.','cp-referrer-and-conversions-tracking'); ?><br />&nbsp;&nbsp; <?php _e('Days from','cp-referrer-and-conversions-tracking'); ?> <?php echo htmlentities($date_start); ?> to <?php echo htmlentities($date_end); ?>.</div>
+        <div style="padding-right:5px;padding-left:5px;color:#888888;">* <?php _e('Logs per day in the selected date range.','cp-referrer-and-conversions-tracking'); ?><br />&nbsp;&nbsp; <?php _e('Days from','cp-referrer-and-conversions-tracking'); ?> <?php echo esc_html($date_start); ?> to <?php echo esc_html($date_end); ?>.</div>
         <div class="clear"></div>
 	</div>
 </div>
@@ -156,7 +164,7 @@ $form = array();
 	</div>
 	<div class="ahb-statssection" >
 		<div class="canvas" id="cardiocontainer2" style="margin-left:10px;position:relative;">
-         <canvas id="cardio2"  width="312" height="200" questions='[{"color":"#008ec2","values":[<?php echo htmlentities($hourly_messages); ?>]}]'></canvas>
+         <canvas id="cardio2"  width="312" height="200" questions='[{"color":"#008ec2","values":[<?php echo esc_html($hourly_messages); ?>]}]'></canvas>
         </div>
         <div style="padding-right:5px;padding-left:5px;color:#888888;">* <?php _e('Total logs per hour in the selected date range.','cp-referrer-and-conversions-tracking'); ?><br />&nbsp;&nbsp; <?php _e('Hours from 0 to 23','cp-referrer-and-conversions-tracking'); ?>.</div>
         <div class="clear"></div>
@@ -176,7 +184,7 @@ $form = array();
 		 <h3><?php _e('Select field for the report','cp-referrer-and-conversions-tracking'); ?>: <select name="field" onchange="document.cfm_formrep.submit();">
               <?php
                    foreach ($fields as $item => $value)
-                       echo '<option value="'.esc_attr($item).'"'.($field_filter==$item?' selected':'').'>'.$item.'</option>';
+                       echo '<option value="'.esc_attr($item).'"'.($field_filter==$item?' selected':'').'>'.esc_html($item).'</option>';
               ?>
          </select></h3>
         </form>
@@ -186,7 +194,7 @@ $form = array();
 
         <div style="width:100%;padding:0;background:white;border:1px solid #e6e6e6;">
          <div style="padding:10px;background:#ECECEC;color:#21759B;font-weight: bold;">
-           <?php _e('Report of values for','cp-referrer-and-conversions-tracking'); ?>: <em><?php echo htmlentities($field_filter); ?></em>
+           <?php _e('Report of values for','cp-referrer-and-conversions-tracking'); ?>: <em><?php echo esc_html($field_filter); ?></em>
          </div>
 
         <div style="padding:10px;">
@@ -202,7 +210,7 @@ $form = array();
           $count = 0;
           foreach ($arr as $item => $value)
           {
-              echo htmlentities($value).' times: '.esc_html(strlen($item)>50?substr($item,1,50).'...':substr($item,1));
+              echo esc_html($value).' times: '.esc_html(strlen($item)>50?substr($item,1,50).'...':substr($item,1));
               echo '<div style="width:'.round($value/$total*100).'%;border:1px solid white;margin-bottom:3px;font-size:9px;text-align:center;font-weight:bold;background-color:#'.$color_array[$count].'">'.round($value/$total*100,2).'%</div>';
               $count++;
               if ($count >= count($color_array)) $count = count($color_array)-1;
@@ -210,7 +218,7 @@ $form = array();
         ?>
         </div>
 
-         <div style="padding-right:5px;padding-left:5px;margin-bottom:20px;color:#888888;">&nbsp;&nbsp;* <?php _e('Number of times that appears each value. Percent in relation to the total of logs.','cp-referrer-and-conversions-tracking'); ?><br />&nbsp;&nbsp;&nbsp;&nbsp; <?php _e('Date range from','cp-referrer-and-conversions-tracking'); ?> <?php echo htmlentities($date_start); ?> <?php _e('to','cp-referrer-and-conversions-tracking'); ?> <?php echo htmlentities($date_end); ?>.</div>
+         <div style="padding-right:5px;padding-left:5px;margin-bottom:20px;color:#888888;">&nbsp;&nbsp;* <?php _e('Number of times that appears each value. Percent in relation to the total of logs.','cp-referrer-and-conversions-tracking'); ?><br />&nbsp;&nbsp;&nbsp;&nbsp; <?php _e('Date range from','cp-referrer-and-conversions-tracking'); ?> <?php echo esc_html($date_start); ?> <?php _e('to','cp-referrer-and-conversions-tracking'); ?> <?php echo esc_html($date_end); ?>.</div>
         </div>
 
         <div style="clear:both"></div>
@@ -249,7 +257,7 @@ $form = array();
 </script>
 
 
-<script type='text/javascript' src='<?php echo plugins_url('js/excanvas.min.js', __FILE__); ?>'></script>
+<script type='text/javascript' src='<?php echo esc_js(plugins_url('js/excanvas.min.js', __FILE__)); ?>'></script>
 <script type="text/javascript">
 var $ = jQuery.noConflict();
 $j(document).ready(function(){

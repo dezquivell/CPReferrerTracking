@@ -76,7 +76,7 @@ $events = $wpdb->get_results( $events_query );
 $total_pages = ceil(count($events) / $records_per_page);
 
 
-if ($message) echo "<div id='setting-error-settings_updated' class='updated'><h2>".$message."</h2></div>";
+if ($message) echo "<div id='setting-error-settings_updated' class='updated'><h2>".esc_html($message)."</h2></div>";
 
 $nonce = wp_create_nonce( 'cpreftrack_actions_booking' );
 
@@ -86,7 +86,7 @@ $nonce = wp_create_nonce( 'cpreftrack_actions_booking' );
  {
     if (confirm('Are you sure that you want to delete this item?'))
     {
-        document.location = 'admin.php?page=<?php echo $this->menu_parameter; ?>_parameters&anonce=<?php echo $nonce; ?>&ld='+id+'&r='+Math.random();
+        document.location = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>_parameters&anonce=<?php echo esc_js($nonce); ?>&ld='+id+'&r='+Math.random();
     }
  }
  function cp_deletemarked()
@@ -98,14 +98,14 @@ $nonce = wp_create_nonce( 'cpreftrack_actions_booking' );
  {
     if (confirm('Are you sure that you want to delete ALL items for this form?'))
     {        
-        document.location = 'admin.php?page=<?php echo $this->menu_parameter; ?>_parameters&del=all&r='+Math.random()+'&anonce=<?php echo $nonce; ?>';
+        document.location = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>_parameters&del=all&r='+Math.random()+'&anonce=<?php echo esc_js($nonce); ?>';
     }    
  }
  function cp_markall()
  {
      var ischecked = document.getElementById("cpcontrolck").checked;
      <?php for ($i=($current_page-1)*$records_per_page; $i<$current_page*$records_per_page; $i++) if (isset($events[$i])) { ?>
-     document.forms.dex_table_form.c<?php echo $i-($current_page-1)*$records_per_page; ?>.checked = ischecked;
+     document.forms.dex_table_form.c<?php echo intval($i-($current_page-1)*$records_per_page); ?>.checked = ischecked;
      <?php } ?>
  } 
 </script>
@@ -116,11 +116,11 @@ $nonce = wp_create_nonce( 'cpreftrack_actions_booking' );
  <div class="ahb-section-container">
 	<div class="ahb-section">
     <form name="dex_table_form" id="dex_table_formadd" action="" method="post">
-     <input type="hidden" name="page" value="<?php echo $this->menu_parameter; ?>_parameters" />
+     <input type="hidden" name="page" value="<?php echo esc_attr($this->menu_parameter) ?>_parameters" />
      <input type="hidden" name="additem" value="1" />
-     <input type="hidden" name="anonce" value="<?php echo $nonce; ?>" />
+     <input type="hidden" name="anonce" value="<?php echo esc_attr($nonce); ?>" />
         <span style="font-size:130%">* The purpose is to use a link like the following for different marketing platforms, so making easier to identify the source referral:<br />
-        <div style="margin:5px; padding:10px; background-color: #ffffcc; border: 1px dotted black; color:blue; font-weight:bold"><?php echo $this->get_site_url();?>?<span style="color:red">source</span>=<span style="color:red">fromfacebook</span></div></span><br /><br />
+        <div style="margin:5px; padding:10px; background-color: #ffffcc; border: 1px dotted black; color:blue; font-weight:bold"><?php echo esc_html($this->get_site_url());?>?<span style="color:red">source</span>=<span style="color:red">fromfacebook</span></div></span><br /><br />
         
 		<label><?php _e('Add New Referral Parameter','cp-referrer-and-conversions-tracking'); ?></label><br />
 		<input style="margin-bottom:3px;" type="text" name="refname" id="refname" placeholder=" - <?php _e('Referral Name, example: &quot;Facebook&quot;','cp-referrer-and-conversions-tracking'); ?> - " class="ahb-new-calendar" />
@@ -140,7 +140,7 @@ $nonce = wp_create_nonce( 'cpreftrack_actions_booking' );
 <div class="ahb-section-container">
 	<div class="ahb-section">
       <form action="admin.php" method="get">
-        <input type="hidden" name="page" value="<?php echo $this->menu_parameter; ?>_parameters" />
+        <input type="hidden" name="page" value="<?php echo esc_attr($this->menu_parameter); ?>_parameters" />
 		<nobr><label><?php _e('Search for','cp-referrer-and-conversions-tracking'); ?>:</label> <input type="text" name="search" value="<?php echo esc_attr($search_value); ?>">&nbsp;&nbsp;</nobr>		
        <div style="float:right">
 		<nobr>         
@@ -174,9 +174,9 @@ echo paginate_links(  array(
 
 <div id="dex_printable_contents" style="overflow:visible !important;"> 
 <form name="dex_table_form" id="dex_table_form" action="admin.php" method="get">
- <input type="hidden" name="page" value="<?php echo $this->menu_parameter; ?>_parameters" />
+ <input type="hidden" name="page" value="<?php echo esc_attr($this->menu_parameter); ?>_parameters" />
  <input type="hidden" name="delmark" value="1" />
- <input type="hidden" name="anonce" value="<?php echo $nonce; ?>" />
+ <input type="hidden" name="anonce" value="<?php echo esc_attr($nonce); ?>" />
 <div class="ahb-orderssection-container" style="background:#f6f6f6;padding-bottom:20px;">
 <table border="0" style="width:100%;" class="ahb-orders-list" cellpadding="10" cellspacing="10">
 	<thead>
@@ -192,13 +192,13 @@ echo paginate_links(  array(
 	<tbody id="the-list">
 	 <?php for ($i=($current_page-1)*$records_per_page; $i<$current_page*$records_per_page; $i++) if (isset($events[$i])) { ?>    
 	  <tr class='<?php if (($i%2)) { ?>alternate <?php } ?>author-self status-draft format-default iedit' valign="top">
-        <th><input type="checkbox" name="c<?php echo $i-($current_page-1)*$records_per_page; ?>" value="<?php echo $events[$i]->id; ?>" /></th>
+        <th><input type="checkbox" name="c<?php echo intval($i-($current_page-1)*$records_per_page); ?>" value="<?php echo esc_attr($events[$i]->id); ?>" /></th>
         <td><?php echo esc_html($events[$i]->refname); ?></td>
         <td><?php echo esc_html($events[$i]->paramname); ?></td>
 		<td><?php echo esc_html($events[$i]->paramvalue); ?></td>
-        <td><a href="<?php echo $this->get_site_url();?>?<?php echo urlencode($events[$i]->paramname); ?>=<?php echo urlencode($events[$i]->paramvalue); ?>"><?php echo $this->get_site_url();?>?<span style="color:red"><?php echo urlencode($events[$i]->paramname); ?></span>=<span style="color:red"><?php echo urlencode($events[$i]->paramvalue); ?></span></a></td>
+        <td><a href="<?php echo esc_attr($this->get_site_url()); ?>?<?php echo esc_attr(urlencode($events[$i]->paramname)); ?>=<?php echo esc_attr(urlencode($events[$i]->paramvalue)); ?>"><?php echo esc_html($this->get_site_url()); ?>?<span style="color:red"><?php echo esc_html(urlencode($events[$i]->paramname)); ?></span>=<span style="color:red"><?php echo esc_html(urlencode($events[$i]->paramvalue)); ?></span></a></td>
 		<td class="cpnopr" style="text-align:center;">        
-		  <input class="button" type="button" name="caldelete_<?php echo $events[$i]->id; ?>" value="Delete" onclick="cp_deleteMessageItem(<?php echo $events[$i]->id; ?>);" />
+		  <input class="button" type="button" name="caldelete_<?php echo esc_attr($events[$i]->id); ?>" value="Delete" onclick="cp_deleteMessageItem(<?php echo esc_attr($events[$i]->id); ?>);" />
 		</td>
       </tr>
      <?php } ?>

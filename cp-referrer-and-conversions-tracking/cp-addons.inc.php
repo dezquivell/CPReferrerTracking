@@ -121,7 +121,7 @@ $nonce = wp_create_nonce( 'cpreftrack_actions_list' );
 	{
 		if( cpreftrack_addons[ i ].checked ) cpreftrack_addons_active_list.push( 'cpreftrack_addons_active_list[]='+encodeURIComponent( cpreftrack_addons[ i ].value ) );
 	}	
-	document.location = 'admin.php?page=<?php echo $this->menu_parameter; ?>_addons&anonce=<?php echo $nonce; ?>&b=1&r='+Math.random()+( ( cpreftrack_addons_active_list.length ) ? '&'+cpreftrack_addons_active_list.join( '&' ) : '' )+'#addons-section';
+	document.location = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>_addons&anonce=<?php echo esc_js($nonce); ?>&b=1&r='+Math.random()+( ( cpreftrack_addons_active_list.length ) ? '&'+cpreftrack_addons_active_list.join( '&' ) : '' )+'#addons-section';
  }    
  
 </script>

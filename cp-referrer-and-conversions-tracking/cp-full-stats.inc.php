@@ -26,6 +26,11 @@ $currentdate = time();
 foreach($rows as $item)
 {        
     $dt_incoming = strtotime($item->time);
+    if (!isset($yearly_incoming["x".date("Y",$dt_incoming)])) $yearly_incoming["x".date("Y",$dt_incoming)] = 0;
+    if (!isset($monthly_incoming["x".date("Ym",$dt_incoming)])) $monthly_incoming["x".date("Ym",$dt_incoming)] = 0;
+    if (!isset($weekly_incoming["x".date("YW",$dt_incoming)])) $weekly_incoming["x".date("YW",$dt_incoming)] = 0;
+    if (!isset($daily_incoming["x".date("Ymd",$dt_incoming)])) $daily_incoming["x".date("Ymd",$dt_incoming)] = 0;
+    
     $yearly_incoming["x".date("Y",$dt_incoming)]++;
     $monthly_incoming["x".date("Ym",$dt_incoming)]++;
     $weekly_incoming["x".date("YW",$dt_incoming)]++;
@@ -36,7 +41,7 @@ function getStatsBy($arr)
 {
     $str = '';
     foreach($arr as $key => $value)
-       $str .= '<div><b>'.substr($key,1).'</b> '.$value.' logs </div>';   
+       $str .= '<div><b>'.esc_html(substr($key,1)).'</b> '.esc_html($value).' logs </div>';   
     return $str;  
 }
 function getStatsByMonthly($arr, $is_incoming = false)
@@ -46,7 +51,7 @@ function getStatsByMonthly($arr, $is_incoming = false)
     for ($i=0;$i<12;$i++)
     {
         $key = "x".date("Ym",$dt);
-        $str .= '<div><b>'.date("Y M",$dt).'</b> '.(isset($arr[$key])?$arr[$key]:0).' logs </div>'; 
+        $str .= '<div><b>'.date("Y M",$dt).'</b> '.esc_html(isset($arr[$key])?$arr[$key]:0).' logs </div>'; 
         $dt = strtotime( "+1 month" ,$dt);    
     }   
     return $str;  
@@ -58,7 +63,7 @@ function getStatsByWeekly($arr, $is_incoming = false)
     for ($i=0;$i<12;$i++)
     {
         $key = "x".date("YW",$dt);
-        $str .= '<div><b>'.date("Y W",$dt).'</b> '.(isset($arr[$key])?$arr[$key]:'0').' logs </div>';         
+        $str .= '<div><b>'.date("Y W",$dt).'</b> '.esc_html(isset($arr[$key])?$arr[$key]:'0').' logs </div>';         
         $dt = strtotime("+1 week",$dt);    
     }   
     return $str;  
@@ -70,7 +75,7 @@ function getStatsByDaily($arr, $is_incoming = false)
     for ($i=0;$i<30;$i++)
     {
         $key = "x".date("Ymd",$dt);
-        $str .= '<div><b>'.date("Y M d",$dt).'</b> '.(isset($arr[$key])?$arr[$key]:'0').' logs </div>'; 
+        $str .= '<div><b>'.date("Y M d",$dt).'</b> '.esc_html(isset($arr[$key])?$arr[$key]:'0').' logs </div>'; 
         $dt = strtotime("+1 day",$dt);    
     }   
     return $str;  

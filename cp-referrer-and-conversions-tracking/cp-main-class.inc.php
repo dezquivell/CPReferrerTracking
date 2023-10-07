@@ -286,7 +286,7 @@ class CP_REFTRACK_Plugin extends CP_REFTRACK_BaseClass {
                                                                        'convdesc' => $conversion_description,
                                                                        'referrer' => $referrer,
                                                                        'referrerlast' => sanitize_text_field(!empty($_COOKIE['cprreftracklatest']) && $referrer!=$_COOKIE['cprreftracklatest']?$_COOKIE['cprreftracklatest']:''),
-                                                                       'entry' => $referrer,
+                                                                       'entry' => (isset($_SERVER["REQUEST_URI"])?$_SERVER["REQUEST_URI"]:''),
                                                                        'time' => current_time('mysql'),
                                                                        ));                                                                         
     }
@@ -394,7 +394,7 @@ class CP_REFTRACK_Plugin extends CP_REFTRACK_BaseClass {
         for ($i=0; $i<$end; $i++)
         {
             $hlabel = $this->iconv("utf-8", "ISO-8859-1//TRANSLIT//IGNORE", ($fields[$i]));
-            echo '"'.str_replace('"','""', $hlabel).'",';
+            echo '"'.str_replace('"','""', $this->clean_csv_value($hlabel)).'",';
         }    
         echo "\n";
         foreach ($values as $item)
@@ -406,7 +406,7 @@ class CP_REFTRACK_Plugin extends CP_REFTRACK_BaseClass {
                 if (is_array($item[$i]))
                     $item[$i] = implode($item[$i],',');
                 $item[$i] = $this->iconv("utf-8", "ISO-8859-1//TRANSLIT//IGNORE", $item[$i]);
-                echo '"'.str_replace('"','""', trim($item[$i])).'",';
+                echo '"'.str_replace('"','""', $this->clean_csv_value($item[$i])).'",';
             }
             echo "\n";
         }
@@ -414,6 +414,15 @@ class CP_REFTRACK_Plugin extends CP_REFTRACK_BaseClass {
         exit;
     }
     
+    
+    function clean_csv_value($value)
+    {
+        $value = trim($value);
+        while (strlen($value) > 1 && in_array($value[0],array('=','@')))
+            $value = trim(substr($value, 1));
+        return $value;
+    }    
+
 
     protected function iconv($from, $to, $text)
     {

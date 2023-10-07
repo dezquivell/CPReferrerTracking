@@ -10,6 +10,8 @@ $nonce = wp_create_nonce( 'cpreftrack_actions_admin' );
 
 $cpid = 'CP_REFTRACK';
 
+$message = '';
+
 $gotab = '';
 if (isset($_POST["gotab"]))
 {
@@ -54,7 +56,7 @@ else
 <h1><?php _e('CP Referrer Tracking - General Settings','cp-referrer-and-conversions-tracking'); ?></h1>
 
 <?php
-    if ($message) echo "<div id='setting-error-settings_updated' class='updated'><h2>".esc_html(message)."</h2></div>";
+    if ($message != '') echo "<div id='setting-error-settings_updated' class='updated'><h2>".esc_html($message)."</h2></div>";
 ?>
 <nav class="nav-tab-wrapper ahb-tab-wrapper">
 	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == '') echo ' nav-tab-active'; ?>" data-tab="1"><?php _e('General Settings','cp-referrer-and-conversions-tracking'); ?></a>	
@@ -64,8 +66,8 @@ else
 <div class="ahb-tab<?php if ($gotab == '') echo ' tab-active'; ?>" data-tab="1">
 	
 	<form name="updatereportsettings" action="" method="post">
-     <input name="nonce" type="hidden" value="<?php echo $nonce; ?>" />
-     <input name="<?php echo $cpid; ?>_post_edition" type="hidden" value="1" />
+     <input name="nonce" type="hidden" value="<?php echo esc_attr($nonce); ?>" />
+     <input name="<?php echo esc_attr($cpid); ?>_post_edition" type="hidden" value="1" />
      <input name="gotab" type="hidden" value="" />
      <table class="form-table">
         <tr valign="top">
